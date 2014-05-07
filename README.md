@@ -1,5 +1,6 @@
-hlock - simple health check helper for heavy PC users
+hlock - simple hourly screen locker for PC users
 ============================
+Good healthy habbits
 its a modification of xlock
 simply blank screen for 5mins(default) on every hour 
 
