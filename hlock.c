@@ -130,36 +130,38 @@ main(int argc, char **argv) {
 	else if(argc != 1)
 		usage();
 
-	if(!(dpy = XOpenDisplay(0)))
-		die("hlock: cannot open display");
-	/* Get the number of screens in display "dpy" and blank them all. */
-	nscreens = ScreenCount(dpy);
-	locks = malloc(sizeof(Lock *) * nscreens);
-	if(locks == NULL)
-		die("hlock: malloc: %s", strerror(errno));
-	int nlocks = 0;
-	for(screen = 0; screen < nscreens; screen++) {
-		if ( (locks[screen] = lockscreen(dpy, screen)) != NULL)
-			nlocks++;
-	}
-	XSync(dpy, False);
+	while (!usleep(BREAK_INTERVAL*60000000)) {
+		
+		if(!(dpy = XOpenDisplay(0)))
+			die("hlock: cannot open display");
+		/* Get the number of screens in display "dpy" and blank them all. */
+		nscreens = ScreenCount(dpy);
+		locks = malloc(sizeof(Lock *) * nscreens);
+		if(locks == NULL)
+			die("hlock: malloc: %s", strerror(errno));
+		int nlocks = 0;
+		for(screen = 0; screen < nscreens; screen++) {
+			if ( (locks[screen] = lockscreen(dpy, screen)) != NULL)
+				nlocks++;
+		}
+		XSync(dpy, False);
 
-	/* Did we actually manage to lock something? */
-	if (nlocks == 0) { // nothing to protect
+		/* Did we actually manage to lock something? */
+		if (nlocks == 0) { // nothing to protect
+			free(locks);
+			XCloseDisplay(dpy);
+			return 1;
+		}
+
+		/*alright take a break, blank screen for Xmins*/
+		usleep(BREAK_DELAY*60000000);
+
+		/* break over, unlock everything and quit. */
+		for(screen = 0; screen < nscreens; screen++)
+			unlockscreen(dpy, locks[screen]);
+
 		free(locks);
 		XCloseDisplay(dpy);
-		return 1;
 	}
-
-	/*alright take a break, blank screen for Xmins*/
-	usleep(BREAK_DELAY*60000000);
-
-	/* break over, unlock everything and quit. */
-	for(screen = 0; screen < nscreens; screen++)
-		unlockscreen(dpy, locks[screen]);
-
-	free(locks);
-	XCloseDisplay(dpy);
-
 	return 0;
 }
