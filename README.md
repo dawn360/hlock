@@ -15,6 +15,10 @@ Installation
 Edit config.mk to match your local setup (hlock is installed into
 the /usr/local namespace by default).
 
+**Default take 3mins break on the hour**
+BREAK_DELAY(Default) = 3(mins)
+BREAK_INTERVAL(Default) = 60(mins)
+
 Afterwards enter the following command to build and install hlock
 (if necessary as root):
 
